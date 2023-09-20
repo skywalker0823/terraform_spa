@@ -97,14 +97,11 @@ resource "null_resource" "deploy" {
 
 
 
-
-
-
-
-
-
-
-
+# Route53 zone data
+data "aws_route53_zone" "zone" {
+  name         = "${var.domain}."
+  private_zone = false
+}
 
 
 
@@ -122,13 +119,6 @@ resource "aws_acm_certificate" "cert" {
   }
 }
 
-
-
-# Route53 zone data
-data "aws_route53_zone" "zone" {
-  name         = "${var.domain}."
-  private_zone = false
-}
 
 
 # 待釐清
@@ -164,20 +154,11 @@ resource "aws_acm_certificate_validation" "cert" {
 
 
 
-
-
-
-
-
-
-
 # 建置Cloudfront
 locals {
   s3_origin_id = "S3-${var.bucket_name}"
 }
 
-# 必須把這裡調整為吃 s3 policy 而非 public
-# 原先寫在創建 cloudfrount 之後，目前往前移，應整個刪掉重新執行
 resource "aws_cloudfront_origin_access_control" "s3_origin_access_identity" {
   signing_behavior = "always"
   signing_protocol = "sigv4"
@@ -298,3 +279,13 @@ output "cloudfront_zone_id" {
 output "domain" {
   value = aws_route53_record.www.name
 }
+
+
+# 大致順序 
+# 1. 建立s3 bucket
+# 2. 建立s3 bucket policy
+# 3. 上傳檔案到s3 bucket  
+# 4. 建立ACM certificate
+# 5. 待釐清x2
+# 6. 建立cloudfront
+# 7. 建立route53的cloudfront紀錄

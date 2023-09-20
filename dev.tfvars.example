@@ -1,0 +1,11 @@
+aws_region = ""
+
+bucket_name = ""
+
+domain = ""
+
+wwwdomain = ""
+
+fqdn = [""]
+
+aws_account_id = ""
